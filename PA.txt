@@ -1,0 +1,14 @@
+Pdf.ExtractImagesFromPDF.ExtractImages PDFFile: $'''H:\\To Extract\\20220328161928979.pdf''' ImagesName: $'''Image''' ImagesFolder: $'''H:\\Extracted Images'''
+Folder.GetFiles Folder: $'''H:\\Extracted Images''' FileFilter: $'''*''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.FullName SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+Excel.LaunchExcel.LaunchUnderExistingProcess Visible: True Instance=> ExcelInstance
+SET LastImage TO Files.Count
+Variables.DecreaseVariable Value: LastImage DecrementValue: 2 DecreasedValue=> LastImage
+LOOP LoopIndex FROM 0 TO LastImage STEP 1
+    DISABLE LOOP LoopIndex FROM 0 TO 2 STEP 1
+        OCR.ExtractTextWithOCR.ExtractTextFromFileWithWindowsOcr ImageFile: Files[LoopIndex] WindowsOcrLanguage: OCR.WindowsOcrLanguage.English ImageWidthMultiplier: 1 ImageHeightMultiplier: 1 OcrText=> OcrText
+            ON ERROR
+        
+            END
+        Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: OcrText Column: 1 Row: LoopIndex + 1
+    END
+    Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''H:\\OCR Extraction.xlsx'''
